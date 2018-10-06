@@ -10,11 +10,15 @@ class HomieNodeProperty(object):
     def setSubscribe(self, func):
         self.subscribe = func
 
-    def __init__(self, node, propertyId):
+    def __init__(self, node, id, name=None, unit=None, datatype=None, format=None):
         super(HomieNodeProperty, self).__init__()
         self.node = node  # stores ref to node
         self._propertyId = None
-        self.propertyId = propertyId
+        self.propertyId = id
+        self.propertyName = name
+        self.propertyUnit = unit
+        self.propertyDatatype = datatype
+        self.propertyFormat = format
         self.handler = None
         self._settable = False
 
@@ -50,6 +54,38 @@ class HomieNodeProperty(object):
             self._propertyId = propertyId
         else:
             logger.warning("'{}' has no valid ID-Format".format(propertyId))
+
+    @property
+    def propertyName(self):
+        return self.propertyName
+
+    @propertyName.setter
+    def propertyName(self, propertyName):
+        self.propertyName = propertyName
+
+    @property
+    def propertyUnit(self):
+        return self.propertyUnit
+
+    @propertyUnit.setter
+    def propertyUnit(self, propertyUnit):
+        self.propertyUnit = propertyUnit
+
+    @property
+    def propertyDatatype(self):
+        return self.propertyDatatype
+
+    @propertyDatatype.setter
+    def propertyDatatype(self, propertyDatatype):
+        self.propertyDatatype = property
+
+    @property
+    def propertyFormat(self):
+        return self.propertyFormat
+
+    @propertyFormat.setter
+    def propertyFormat(self, propertyFormat):
+        self.propertyFormat = propertyFormat 
 
 
 class HomieNodeRange(HomieNodeProperty):
