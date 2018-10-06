@@ -19,3 +19,10 @@ def isIdFormat(idString):
     if isinstance(idString, str):
         r = re.compile('(^(?!\-)[a-z0-9\-]+(?<!\-)$)')
         return True if r.match(idString) else False
+
+def isValidDatatype(datatype):
+    """Validate datatype"""
+    valid_datatypes = ("integer", "float", "boolean", "string", "enum", "color")
+    if datatype in valid_datatypes:
+        return True
+    return False
