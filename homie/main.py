@@ -144,7 +144,7 @@ class Device(object):
         self.mqtt.on_disconnect = self._disconnected
 
         self.mqtt.will_set(
-            self.mqtt_topic + "/$online", payload="false", retain=True)
+            self.mqtt_topic + "/$online", payload="lost", retain=True)
 
         if self.username:
             self.mqtt.username_pw_set(self.username, password=self.password)
@@ -186,22 +186,27 @@ class Device(object):
             self._subscribe()
 
         self.publish(
-            self.mqtt_topic + "/$online",
-            payload="true", retain=True)
+            self.mqtt_topic + "/$state",
+            payload="init", retain=True)
         self.publish(
             self.mqtt_topic + "/$name",
             payload=self.deviceName, retain=True)
 
         self.publishHomieVersion()
+        self.publishLocalipAndMac()
         self.publishFwname()
         self.publishFwversion()
-        self.publishNodes()
-        self.publishLocalipAndMac()
+        self.publishImplementation()
         self.publishStats()
         self.publishStatsInterval()
         self.publishUptime()
         self.publishSignal()
-        self.publishImplementation()
+        self.publishNodes()
+
+        self.publish(
+            self.mqtt_topic + "/$state",
+            payload="ready", retain=True
+        )
 
     def _subscribed(self, *args):
         # logger.debug("_subscribed: {}".format(args))
@@ -455,7 +460,7 @@ class Device(object):
 
         self.publish(
             self.mqtt_topic + "/$online",
-            payload="false", retain=True)
+            payload="disconnected", retain=True)
 
         self.mqtt.loop_stop()
         self.mqtt.disconnect()
