@@ -81,7 +81,7 @@ class HomieNodeProperty(object):
         if isValidId(id):
             self._id = id
         else:
-            logger.warning("'{}' has no valid ID-Format".format(id))
+            raise ValueError("'{}' is not a valid ID for a property".format(id))
 
     @property
     def propertyName(self):
