@@ -21,7 +21,7 @@ class HomieNode(object):
             return
         if id not in self.properties:
             homieNodeProperty = HomieNodeProperty(self, id, name, unit, datatype, format)
-            homieNodeProperty.setSubscribe(self.homie.subscribe)
+            homieNodeProperty.setSubscribe(self.homie.subscribeProperty)
             if homieNodeProperty:
                 self.properties[id] = homieNodeProperty
             return homieNodeProperty
@@ -38,7 +38,7 @@ class HomieNode(object):
             return
         if id not in self.properties:
             homieNodePropertyRange = HomieNodePropertyRange(self, id, lower, upper, name, unit, datatype, format)
-            homieNodePropertyRange.setSubscribe(self.homie.subscribe)
+            homieNodePropertyRange.setSubscribe(self.homie.subscribeProperty)
             if homieNodePropertyRange:
                 self.properties[id] = homieNodePropertyRange
             return homieNodePropertyRange
