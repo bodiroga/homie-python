@@ -6,24 +6,24 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 config = homie.loadConfigFile("homie-python.json")
-Homie = homie.Homie(config)
-switchNode = Homie.Node("switch", "switch")
+device = homie.Device(config)
+switchNode = device.addNode("switch", "switch", "switch")
+switchProperty = switchNode.addProperty("on")
 
-
-def switchOnHandler(mqttc, obj, msg):
-    payload = msg.payload.decode("UTF-8").lower()
-    if payload == 'true':
+def switchOnHandler(property, value):
+    if value == 'true':
         logger.info("Switch: ON")
-        switchNode.setProperty("on").send("true")
+        property.update("true")
     else:
         logger.info("Switch: OFF")
-        switchNode.setProperty("on").send("false")
+        property.update("false")
 
 
 def main():
-    Homie.setFirmware("relay-switch", "1.0.0")
-    switchNode.advertise("on").settable(switchOnHandler)
-    Homie.setup()
+    device.setFirmware("relay-switch", "1.0.0")
+    switchProperty.settable(switchOnHandler)
+    
+    device.setup()
 
     while True:
         time.sleep(1)

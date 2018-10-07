@@ -19,8 +19,9 @@ device_file = device_folder + '/w1_slave'
 TEMPERATURE_INTERVAL = 60
 
 config = homie.loadConfigFile("homie-python.json")
-Homie = homie.Homie(config)
-temperatureNode = Homie.Node("temperature", "temperature")
+device = homie.Device(config)
+temperatureNode = device.addNode("temperature", "temperature", "temperature")
+temperatureProperty = temperatureNode.addProperty("temperature", "Temperature value", "ºC", "float")
 
 def read_temp_raw():
     f = open(device_file, 'r')
@@ -41,15 +42,14 @@ def read_temp():
         return temp_c
 
 def main():
-    Homie.setFirmware("raspi-temperatureDS18B20", "1.0.0")
-    temperatureNode.advertise("degrees")
+    device.setFirmware("raspi-temperatureDS18B20", "1.0.0")
 
-    Homie.setup()
+    device.setup()
 
     while True:
         temperature = read_temp()
         logger.info("Temperature: {:0.2f} °C".format(temperature))
-        temperatureNode.setProperty("degrees").send(temperature)
+        temperatureProperty.update(temperature)
         time.sleep(TEMPERATURE_INTERVAL)
 
 if __name__ == '__main__':

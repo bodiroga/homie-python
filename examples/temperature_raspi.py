@@ -9,8 +9,9 @@ logger = logging.getLogger(__name__)
 TEMPERATURE_INTERVAL = 60
 
 config = homie.loadConfigFile("homie-python.json")
-Homie = homie.Homie(config)
-temperatureNode = Homie.Node("temperature", "temperature")
+device = homie.Device(config)
+temperatureNode = device.addNode("temperature", "temperature", "temperature")
+temperatureProperty = temperatureNode.addProperty("temperature", "Temperature value", "ºC", "float")
 
 
 def getCpuTemperature():
@@ -21,15 +22,14 @@ def getCpuTemperature():
 
 
 def main():
-    Homie.setFirmware("raspi-temperature", "1.0.0")
-    temperatureNode.advertise("degrees")
+    device.setFirmware("raspi-temperature", "1.0.0")
 
-    Homie.setup()
+    device.setup()
 
     while True:
         temperature = getCpuTemperature()
         logger.info("Temperature: {:0.2f} °C".format(temperature))
-        temperatureNode.setProperty("degrees").send(temperature)
+        temperatureProperty.update(temperature)
         time.sleep(TEMPERATURE_INTERVAL)
 
 if __name__ == '__main__':
