@@ -24,8 +24,10 @@ class HomieNode(object):
             homieNodeProperty.setSubscribe(self.homie.subscribe)
             if homieNodeProperty:
                 self.properties[id] = homieNodeProperty
+            return homieNodeProperty
         else:
             logger.warning("Property '{}' already created.".format(id))
+            return self.properties[id]
 
     def addPropertyRange(self, id=None, lower=None, upper=None, name=None, unit=None, datatype=None, format=None):
         if not id:
@@ -39,8 +41,10 @@ class HomieNode(object):
             homieNodePropertyRange.setSubscribe(self.homie.subscribe)
             if homieNodePropertyRange:
                 self.properties[id] = homieNodePropertyRange
+            return homieNodePropertyRange
         else:
             logger.warning("PropertyRange '{}' alread created.".format(id))
+            return self.properties[id]
 
     def setProperty(self, propertyId):
         if propertyId not in self.properties:
