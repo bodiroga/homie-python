@@ -13,8 +13,8 @@ class HomieNodeProperty(object):
     def __init__(self, node, id, name=None, unit=None, datatype=None, format=None):
         super(HomieNodeProperty, self).__init__()
         self.node = node  # stores ref to node
-        self._propertyId = None
-        self.propertyId = id
+        self._id = None
+        self.id = id
         self.propertyName = name
         self.propertyUnit = unit
         self.propertyDatatype = datatype
@@ -24,7 +24,7 @@ class HomieNodeProperty(object):
 
     def settable(self, handler):
         self.handler = handler
-        self.subscribe(self.node, self.propertyId, handler)
+        self.subscribe(self.node, self.id, handler)
         self._settable = True
 
     def send(self, value):
@@ -33,27 +33,27 @@ class HomieNodeProperty(object):
                 self.node.homie.baseTopic,
                 self.node.homie.deviceId,
                 self.node.nodeId,
-                self.propertyId,
+                self.id,
             ]),
             value,
         )
 
     def representation(self):
-        repr = self.propertyId
+        repr = self.id
         if self._settable:
             repr += ":settable"
         return repr
 
     @property
-    def propertyId(self):
-        return self._propertyId
+    def id(self):
+        return self._id
 
-    @propertyId.setter
-    def propertyId(self, propertyId):
-        if isIdFormat(propertyId):
-            self._propertyId = propertyId
+    @id.setter
+    def id(self, id):
+        if isIdFormat(id):
+            self._id = id
         else:
-            logger.warning("'{}' has no valid ID-Format".format(propertyId))
+            logger.warning("'{}' has no valid ID-Format".format(id))
 
     @property
     def propertyName(self):
@@ -88,22 +88,22 @@ class HomieNodeProperty(object):
         self.propertyFormat = propertyFormat 
 
 
-class HomieNodeRange(HomieNodeProperty):
+class HomieNodePropertyRange(HomieNodeProperty):
     """docstring for HomieNodeRange"""
 
-    def __init__(self, node, propertyId, lower, upper):
-        super(HomieNodeRange, self).__init__(node, propertyId)
+    def __init__(self, node, id, lower, upper, name=None, unit=None, datatype=None, format=None):
+        super(HomieNodePropertyRange, self).__init__(node, id, name, unit, datatype, format)
         self.node = node
         self._range = range(lower, upper + 1)
         self.range = None
         self.lower = lower
         self.upper = upper
-        self.range_names = [(propertyId + "_" + str(x)) for x in self._range]
+        self.range_names = [(id + "_" + str(x)) for x in self._range]
 
     def settable(self, handler):
         self.handler = handler
         for x in self._range:
-            self.subscribe(self.node, "{}_{}".format(self.propertyId, x), handler)
+            self.subscribe(self.node, "{}_{}".format(self.id, x), handler)
 
     def setRange(self, lower, upper):
         # Todo: validate input
@@ -123,13 +123,13 @@ class HomieNodeRange(HomieNodeProperty):
                     self.node.homie.baseTopic,
                     self.node.homie.deviceId,
                     self.node.nodeId,
-                    self.propertyId + "_" + str(x),
+                    self.id + "_" + str(x),
                 ]),
                 value,
             )
 
     def representation(self):
-        repr = "{}[{}-{}]".format(self.propertyId, self.lower, self.upper)
+        repr = "{}[{}-{}]".format(self.id, self.lower, self.upper)
         if self._settable:
             repr += ":settable"
         return repr
