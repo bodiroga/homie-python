@@ -51,7 +51,7 @@ class HomieNode(object):
             raise ValueError("Property '{}' does not exist".format(propertyId))
         return self.properties[propertyId]
 
-    def sendProperties(self):
+    def publishProperties(self):
         nodeTopic = "/".join([self.homie.baseTopic, self.homie.deviceId, self.nodeId])
 
         self.homie.publish(nodeTopic + "/$type", self.nodeType)
