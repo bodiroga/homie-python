@@ -2,7 +2,7 @@
 import logging
 from homie.helpers import isIdFormat
 from homie.property import HomieNodeProperty
-from homie.property import HomieNodeRange
+from homie.property import HomieNodePropertyRange
 logger = logging.getLogger(__name__)
 
 class HomieNode(object):
@@ -15,25 +15,32 @@ class HomieNode(object):
         self.nodeType = nodeType
         self.properties = {}
 
-    def advertise(self, propertyId):
-        if propertyId not in self.properties:
-            homieNodeProperty = HomieNodeProperty(self, propertyId)
+    def addProperty(self, id=None, name=None, unit=None, datatype=None, format=None):
+        if not id:
+            logger.error("'id' required for HomieNodeProperty")
+            return
+        if id not in self.properties:
+            homieNodeProperty = HomieNodeProperty(id, name, unit, datatype, format)
             homieNodeProperty.setSubscribe(self.homie.subscribe)
             if homieNodeProperty:
-                self.properties[propertyId] = homieNodeProperty
-                return(homieNodeProperty)
+                self.properties[id] = homieNodeProperty
         else:
-            logger.warning("Property '{}' already announced.".format(propertyId))
+            logger.warning("Property '{}' already created.".format(id))
 
-    def advertiseRange(self, propertyId, lower, upper):
-        if propertyId not in self.properties:
-            homieNodeRange = HomieNodeRange(self, propertyId, lower, upper)
-            homieNodeRange.setSubscribe(self.homie.subscribe)
-            if homieNodeRange:
-                self.properties[propertyId] = homieNodeRange
-                return(homieNodeRange)
+    def addPropertyRange(self, id=None, lower=None, upper=None, name=None, unit=None, datatype=None, format=None):
+        if not id:
+            logger.error("'id' value required for HomieNodePropertyRange")
+            return
+        if not lower or not upper:
+            logger.error("'lower' and 'upper' values required for HomieNodePropertyRange")
+            return
+        if id not in self.properties:
+            homieNodePropertyRange = HomieNodePropertyRange(id, lower, upper, name, unit, datatype, format)
+            homieNodePropertyRange.setSubscribe(self.homie.subscribe)
+            if homieNodePropertyRange:
+                self.properties[id] = homieNodePropertyRange
         else:
-            logger.warning("Property '{}' already announced.".format(propertyId))
+            logger.warning("PropertyRange '{}' alread created.".format(id))
 
     def setProperty(self, propertyId):
         if propertyId not in self.properties:
