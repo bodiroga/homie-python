@@ -59,6 +59,9 @@ class HomieNode(object):
         payload = ",".join([property.representation() for id, property in self.properties.items()])
         self.homie.publish(nodeTopic + "/$properties", payload)
 
+        for nodeProperty in self.properties.items():
+            nodeProperty.publishAttributes()
+
     @property
     def nodeId(self):
         return self._nodeId

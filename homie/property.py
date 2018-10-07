@@ -44,6 +44,30 @@ class HomieNodeProperty(object):
             repr += ":settable"
         return repr
 
+    def publishAttribute(self, name, value):
+        self.node.homie.publish(
+            "/".join([
+                self.node.homie.baseTopic,
+                self.node.homie.deviceId,
+                self.node.nodeId,
+                self.id,
+                "${}".format(name)
+            ]),
+            value,
+        )
+
+    def publishAttributes(self):
+        if self.propertyName:
+            self.publishAttribute("name", self.propertyName)
+        if self._settable:
+            self.publishAttribute("settable", self._settable)
+        if self.propertyUnit:
+            self.publishAttribute("unit", self.propertyUnit)
+        if self.propertyDatatype:
+            self.publishAttribute("datatype", self.propertyDatatype)
+        if self.propertyFormat:
+            self.publishAttribute("format", self.propertyFormat)
+
     @property
     def id(self):
         return self._id
