@@ -31,7 +31,7 @@ class HomieNodeProperty(object):
         self.subscribe(self.node, self.id, handler)
         self._settable = True
 
-    def send(self, value):
+    def update(self, value):
         self.node.homie.publish(
             "/".join([
                 self.node.homie.baseTopic,
