@@ -14,6 +14,10 @@ class HomieNodeProperty(object):
         super(HomieNodeProperty, self).__init__()
         self.node = node  # stores ref to node
         self._id = None
+        self._propertyName = None
+        self._propertyUnit = None
+        self._propertyDatatype = None
+        self._propertyFormat = None
         self.id = id
         self.propertyName = name
         self.propertyUnit = unit
@@ -57,16 +61,17 @@ class HomieNodeProperty(object):
         )
 
     def publishAttributes(self):
-        if self.propertyName:
-            self.publishAttribute("name", self.propertyName)
+        if self._propertyName:
+            self.publishAttribute("name", self._propertyName)
         if self._settable:
             self.publishAttribute("settable", self._settable)
-        if self.propertyUnit:
-            self.publishAttribute("unit", self.propertyUnit)
-        if self.propertyDatatype:
-            self.publishAttribute("datatype", self.propertyDatatype)
-        if self.propertyFormat:
-            self.publishAttribute("format", self.propertyFormat)
+        if self._propertyUnit:
+            self.publishAttribute("unit", self._propertyUnit)
+        if self._propertyDatatype:
+            logger.error("Datatype: {}".format(self._propertyDatatype))
+            self.publishAttribute("datatype", self._propertyDatatype)
+        if self._propertyFormat:
+            self.publishAttribute("format", self._propertyFormat)
 
     @property
     def id(self):
@@ -81,35 +86,35 @@ class HomieNodeProperty(object):
 
     @property
     def propertyName(self):
-        return self.propertyName
+        return self._propertyName
 
     @propertyName.setter
-    def propertyName(self, propertyName):
-        self.propertyName = propertyName
+    def propertyName(self, name):
+        self._propertyName = name
 
     @property
     def propertyUnit(self):
-        return self.propertyUnit
+        return self._propertyUnit
 
     @propertyUnit.setter
-    def propertyUnit(self, propertyUnit):
-        self.propertyUnit = propertyUnit
+    def propertyUnit(self, unit):
+        self._propertyUnit = unit
 
     @property
     def propertyDatatype(self):
-        return self.propertyDatatype
+        return self._propertyDatatype
 
     @propertyDatatype.setter
-    def propertyDatatype(self, propertyDatatype):
-        self.propertyDatatype = property
+    def propertyDatatype(self, datatype):
+        self._propertyDatatype = datatype
 
     @property
     def propertyFormat(self):
-        return self.propertyFormat
+        return self._propertyFormat
 
     @propertyFormat.setter
-    def propertyFormat(self, propertyFormat):
-        self.propertyFormat = propertyFormat 
+    def propertyFormat(self, format):
+        self._propertyFormat = format 
 
 
 class HomieNodePropertyRange(HomieNodeProperty):
