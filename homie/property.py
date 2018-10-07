@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 import logging
-from homie.helpers import isIdFormat
+from homie.helpers import isValidId, isValidDatatype, isValidFormat, isValidUnit
 logger = logging.getLogger(__name__)
 
 class HomieNodeProperty(object):
@@ -68,7 +68,6 @@ class HomieNodeProperty(object):
         if self._propertyUnit:
             self.publishAttribute("unit", self._propertyUnit)
         if self._propertyDatatype:
-            logger.error("Datatype: {}".format(self._propertyDatatype))
             self.publishAttribute("datatype", self._propertyDatatype)
         if self._propertyFormat:
             self.publishAttribute("format", self._propertyFormat)
@@ -79,7 +78,7 @@ class HomieNodeProperty(object):
 
     @id.setter
     def id(self, id):
-        if isIdFormat(id):
+        if isValidId(id):
             self._id = id
         else:
             logger.warning("'{}' has no valid ID-Format".format(id))
@@ -98,7 +97,11 @@ class HomieNodeProperty(object):
 
     @propertyUnit.setter
     def propertyUnit(self, unit):
-        self._propertyUnit = unit
+        if unit:
+            if isValidUnit(unit):
+                self._propertyUnit = unit
+            else:
+                logger.warning("'{}' is not a valid unit".format(unit))
 
     @property
     def propertyDatatype(self):
@@ -106,7 +109,11 @@ class HomieNodeProperty(object):
 
     @propertyDatatype.setter
     def propertyDatatype(self, datatype):
-        self._propertyDatatype = datatype
+        if datatype:
+            if isValidDatatype(datatype):
+                self._propertyDatatype = datatype
+            else:
+                logger.warning("'{}' is not a valid datatype".format(datatype))
 
     @property
     def propertyFormat(self):
@@ -114,8 +121,11 @@ class HomieNodeProperty(object):
 
     @propertyFormat.setter
     def propertyFormat(self, format):
-        self._propertyFormat = format 
-
+        if format or self._propertyDatatype:
+            if isValidFormat(self._propertyDatatype, format):
+                self._propertyFormat = format 
+            else:
+                logger.warning("'{}' is not a valid format for {}".format(format, self._propertyDatatype))
 
 class HomieNodePropertyRange(HomieNodeProperty):
     """docstring for HomieNodeRange"""
