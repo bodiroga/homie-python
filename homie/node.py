@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import logging
+from homie.helpers import isValidId
 from homie.property import HomieNodeProperty
 from homie.property import HomieNodePropertyRange
 logger = logging.getLogger(__name__)
@@ -67,7 +68,10 @@ class HomieNode(object):
 
     @nodeId.setter
     def nodeId(self, nodeId):
-        self._nodeId = nodeId
+        if isValidId(nodeId):
+            self._nodeId = nodeId
+        else:
+            raise ValueError("'{}' is not a valid ID for a node".format(nodeId))
 
     @property
     def nodeType(self):
