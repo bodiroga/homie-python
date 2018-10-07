@@ -11,7 +11,7 @@ from homie.mqtt import HomieMqtt
 from homie.timer import HomieTimer
 from homie.node import HomieNode
 from homie.networkinformation import NetworkInformation
-from homie.helpers import isIdFormat, generateDeviceId
+from homie.helpers import isValidId, generateDeviceId
 logger = logging.getLogger(__name__)
 
 HOMIE_VERSION = "2.0.1"
@@ -49,11 +49,11 @@ def loadConfigFile(configFile):
     return config
 
 
-class Homie(object):
-    """docstring for Homie"""
+class Device(object):
+    """docstring for Device"""
 
     def __init__(self, config):
-        super(Homie, self).__init__()
+        super(Device, self).__init__()
         atexit.register(self._exitus)
 
         self.deviceId = None
@@ -75,9 +75,10 @@ class Homie(object):
         self.startTime = time.time()
         self.fwname = None
         self.fwversion = None
-        self.nodes = []
+        self.nodes = {}
         self.timers = []
         self.subscriptions = []
+        self.subscriptions_handlers = {}
         self.subscribe_all_forced = False
         self.statsInterval = 60
 
@@ -101,9 +102,9 @@ class Homie(object):
         self.timers.append(homieTimer)
         return(homieTimer)
 
-    def Node(self, nodeId, nodeType):
+    def addNode(self, nodeId, nodeType):
         homieNode = HomieNode(self, nodeId, nodeType)
-        self.nodes.append(homieNode)
+        self.nodes[nodeId] = homieNode
         return(homieNode)
 
     def _initAttrs(self, config):
@@ -244,8 +245,18 @@ class Homie(object):
         ])
         self.publish(topic, payload=val, retain=retain)
 
-    def subscribe(self, homieNode, attr, callback, qos=None):
-        """ Register new subscription and add a callback """
+    def subscribePropertyHandler(self, mqttc, obj, msg):
+        topic = msg.topic
+        value = msg.payload.decode("UTF-8")
+
+        if topic in self.subscriptions_handlers:
+            nodeId = topic.split("/")[-3]
+            propertyId = topic.split("/")[-2]
+            property = self.nodes[nodeId].properties[propertyId]
+            self.subscriptions_handlers[topic](property, value)
+
+    def subscribeProperty(self, homieNode, attr, callback, qos=None):
+        """ Register new subscription for property and add a callback """
         self._checkBeforeSetup()
 
         # user qos prefs
@@ -264,36 +275,12 @@ class Homie(object):
 
         if not self.subscribe_all:
             self.subscriptions.append((subscription, qos))
+            self.subscriptions_handlers[subscription] = callback
 
         if self.mqtt_connected:
             self._subscribe()
 
-        self.mqtt.message_callback_add(subscription, callback)
-
-    def subscribeProperty(self, homieNode, attr, callback, qos=None):
-        """ Register new subscription for property and add a callback """
-        self._checkBeforeSetup()
-
-        # user qos prefs
-        if qos is None:
-            qos = int(self.qos)
-
-        subscription = str("/".join(
-            [
-                self.mqtt_topic,
-                homieNode.nodeId,
-                attr
-            ]))
-
-        logger.debug("subscribe: {} {}".format(subscription, qos))
-
-        if not self.subscribe_all:
-            self.subscriptions.append((subscription, qos))
-
-        if self.mqtt_connected:
-            self._subscribe()
-
-        self.mqtt.message_callback_add(subscription, callback)
+        self.mqtt.message_callback_add(subscription, self.subscribePropertyHandler)
 
     def publish(self, topic, payload, retain=True, qos=None, **kwargs):
         """ Publish messages to MQTT, if connected """
@@ -321,13 +308,13 @@ class Homie(object):
     def publishNodes(self):
         """ Publish registered nodes and their properties to MQTT """
         payload = ",".join(
-            [str(x.nodeId) for x in self.nodes])
+            list(self.nodes.keys()))
         self.publish(
             self.mqtt_topic + "/$nodes",
             payload=payload, retain=True)
 
-        for node in self.nodes:
-            node.sendProperties()
+        for node in self.nodes.values():
+            node.publishProperties()
 
     def publishLocalipAndMac(self):
         """Publish local IP and MAC Addresses to MQTT."""
@@ -426,7 +413,7 @@ class Homie(object):
 
     @deviceId.setter
     def deviceId(self, deviceId):
-        if isIdFormat(deviceId):
+        if isValidId(deviceId):
             self._deviceId = deviceId
         else:
             self._deviceId = generateDeviceId()
