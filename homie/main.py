@@ -102,8 +102,8 @@ class Device(object):
         self.timers.append(homieTimer)
         return(homieTimer)
 
-    def addNode(self, nodeId, nodeType):
-        homieNode = HomieNode(self, nodeId, nodeType)
+    def addNode(self, nodeId, nodeName, nodeType):
+        homieNode = HomieNode(self, nodeId, nodeName, nodeType)
         self.nodes[nodeId] = homieNode
         return(homieNode)
 

@@ -8,10 +8,11 @@ logger = logging.getLogger(__name__)
 class HomieNode(object):
     """docstring for HomieNode"""
 
-    def __init__(self, homie, nodeId, nodeType):
+    def __init__(self, homie, nodeId, nodeName, nodeType):
         super(HomieNode, self).__init__()
         self.homie = homie
         self.nodeId = nodeId
+        self.nodeName = nodeName
         self.nodeType = nodeType
         self.properties = {}
 
@@ -54,6 +55,7 @@ class HomieNode(object):
     def publishProperties(self):
         nodeTopic = "/".join([self.homie.baseTopic, self.homie.deviceId, self.nodeId])
 
+        self.homie.publish(nodeTopic + "/$name", self.nodeName)
         self.homie.publish(nodeTopic + "/$type", self.nodeType)
 
         payload = ",".join([property.representation() for id, property in self.properties.items()])
@@ -72,6 +74,14 @@ class HomieNode(object):
             self._nodeId = nodeId
         else:
             raise ValueError("'{}' is not a valid ID for a node".format(nodeId))
+
+    @property
+    def nodeName(self):
+        return self._nodeName
+
+    @nodeName.setter
+    def nodeName(self, nodeName):
+        self._nodeName = nodeName
 
     @property
     def nodeType(self):
