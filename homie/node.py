@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import logging
-from homie.helpers import isIdFormat
 from homie.property import HomieNodeProperty
 from homie.property import HomieNodePropertyRange
 logger = logging.getLogger(__name__)
@@ -20,7 +19,7 @@ class HomieNode(object):
             logger.error("'id' required for HomieNodeProperty")
             return
         if id not in self.properties:
-            homieNodeProperty = HomieNodeProperty(id, name, unit, datatype, format)
+            homieNodeProperty = HomieNodeProperty(self, id, name, unit, datatype, format)
             homieNodeProperty.setSubscribe(self.homie.subscribe)
             if homieNodeProperty:
                 self.properties[id] = homieNodeProperty
@@ -37,7 +36,7 @@ class HomieNode(object):
             logger.error("'lower' and 'upper' values required for HomieNodePropertyRange")
             return
         if id not in self.properties:
-            homieNodePropertyRange = HomieNodePropertyRange(id, lower, upper, name, unit, datatype, format)
+            homieNodePropertyRange = HomieNodePropertyRange(self, id, lower, upper, name, unit, datatype, format)
             homieNodePropertyRange.setSubscribe(self.homie.subscribe)
             if homieNodePropertyRange:
                 self.properties[id] = homieNodePropertyRange
@@ -59,8 +58,8 @@ class HomieNode(object):
         payload = ",".join([property.representation() for id, property in self.properties.items()])
         self.homie.publish(nodeTopic + "/$properties", payload)
 
-        for nodeProperty in self.properties.items():
-            nodeProperty.publishAttributes()
+        for property in self.properties.values():
+            property.publishAttributes()
 
     @property
     def nodeId(self):
