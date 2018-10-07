@@ -197,6 +197,7 @@ class Device(object):
         self.publishFwversion()
         self.publishNodes()
         self.publishLocalipAndMac()
+        self.publishStats()
         self.publishStatsInterval()
         self.publishUptime()
         self.publishSignal()
@@ -329,6 +330,16 @@ class Device(object):
         self.publish(
             self.mqtt_topic + "/$mac",
             payload=local_mac, retain=True)
+
+    def publishStats(self):
+        """Publish stats info"""
+        payload = ",".join([
+            "interval", "uptime", "signal"
+        ])
+        self.publish(
+            self.mqtt_topic + "/$stats",
+            payload=payload, retain=True
+        )
 
     def publishStatsInterval(self):
         """ Publish /$stats/interval to MQTT """
