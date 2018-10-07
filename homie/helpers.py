@@ -17,7 +17,7 @@ def isValidId(idString):
     """Validate device Id."""
     logger.debug("isIdFormat")
     if isinstance(idString, str):
-        r = re.compile('r(^(?!\-)[a-z0-9\-]+(?<!\-)$)')
+        r = re.compile('(^(?!\-)[a-z0-9\-]+(?<!\-)$)')
         return True if r.match(idString) else False
 
 def isValidDatatype(datatype):
