@@ -46,7 +46,7 @@ class HomieNode(object):
             logger.warning("PropertyRange '{}' alread created.".format(id))
             return self.properties[id]
 
-    def setProperty(self, propertyId):
+    def getProperty(self, propertyId):
         if propertyId not in self.properties:
             raise ValueError("Property '{}' does not exist".format(propertyId))
         return self.properties[propertyId]
