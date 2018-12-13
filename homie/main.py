@@ -14,7 +14,7 @@ from homie.networkinformation import NetworkInformation
 from homie.helpers import isValidId, generateDeviceId
 logger = logging.getLogger(__name__)
 
-HOMIE_VERSION = "3.0.0"
+HOMIE_VERSION = "3.0.1"
 DEFAULT_PREFS = {
     "CA_CERTS": {"key": "ca_certs", "val": None},
     "DEVICE_ID": {"key": "deviceId", "val": "xxxxxxxx"},

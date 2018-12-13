@@ -10,7 +10,7 @@ class HomieNodeProperty(object):
     def setSubscribe(self, func):
         self.subscribe = func
 
-    def __init__(self, node, id, name=None, unit=None, datatype=None, format=None):
+    def __init__(self, node, id, name=None, unit=None, datatype=None, format=None, retained=True):
         super(HomieNodeProperty, self).__init__()
         self.node = node  # stores ref to node
         self._id = None
@@ -18,11 +18,13 @@ class HomieNodeProperty(object):
         self._propertyUnit = None
         self._propertyDatatype = None
         self._propertyFormat = None
+        self._retained = True
         self.id = id
         self.propertyName = name
         self.propertyUnit = unit
         self.propertyDatatype = datatype
         self.propertyFormat = format
+        self.retained = retained
         self.handler = None
         self._settable = False
 
@@ -40,13 +42,11 @@ class HomieNodeProperty(object):
                 self.id,
             ]),
             value,
+            self._retained
         )
 
     def representation(self):
-        repr = self.id
-        if self._settable:
-            repr += ":settable"
-        return repr
+        return self.id
 
     def publishAttribute(self, name, value):
         self.node.homie.publish(
@@ -64,13 +64,15 @@ class HomieNodeProperty(object):
         if self._propertyName:
             self.publishAttribute("name", self._propertyName)
         if self._settable:
-            self.publishAttribute("settable", self._settable)
+            self.publishAttribute("settable", str(self._settable).lower())
         if self._propertyUnit:
             self.publishAttribute("unit", self._propertyUnit)
         if self._propertyDatatype:
             self.publishAttribute("datatype", self._propertyDatatype)
         if self._propertyFormat:
             self.publishAttribute("format", self._propertyFormat)
+        if not self._retained:
+            self.publishAttribute("retained", str(self._retained).lower())
 
     @property
     def id(self):
@@ -127,11 +129,19 @@ class HomieNodeProperty(object):
             else:
                 logger.warning("'{}' is not a valid format for {}".format(format, self._propertyDatatype))
 
+    @property
+    def retained(self):
+        return self._retained
+
+    @retained.setter
+    def retained(self, retained):
+        self._retained = retained
+
 class HomieNodePropertyRange(HomieNodeProperty):
     """docstring for HomieNodeRange"""
 
-    def __init__(self, node, id, lower, upper, name=None, unit=None, datatype=None, format=None):
-        super(HomieNodePropertyRange, self).__init__(node, id, name, unit, datatype, format)
+    def __init__(self, node, id, lower, upper, name=None, unit=None, datatype=None, format=None, retained=True):
+        super(HomieNodePropertyRange, self).__init__(node, id, name, unit, datatype, format, retained)
         self.node = node
         self._range = range(lower, upper + 1)
         self.range = None
@@ -169,7 +179,5 @@ class HomieNodePropertyRange(HomieNodeProperty):
 
     def representation(self):
         repr = "{}[{}-{}]".format(self.id, self.lower, self.upper)
-        if self._settable:
-            repr += ":settable"
         return repr
 

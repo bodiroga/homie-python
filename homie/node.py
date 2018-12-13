@@ -16,12 +16,12 @@ class HomieNode(object):
         self.nodeType = nodeType
         self.properties = {}
 
-    def addProperty(self, id=None, name=None, unit=None, datatype=None, format=None):
+    def addProperty(self, id=None, name=None, unit=None, datatype=None, format=None, retained=True):
         if not id:
             logger.error("'id' required for HomieNodeProperty")
             return
         if id not in self.properties:
-            homieNodeProperty = HomieNodeProperty(self, id, name, unit, datatype, format)
+            homieNodeProperty = HomieNodeProperty(self, id, name, unit, datatype, format, retained)
             homieNodeProperty.setSubscribe(self.homie.subscribeProperty)
             if homieNodeProperty:
                 self.properties[id] = homieNodeProperty
@@ -30,7 +30,7 @@ class HomieNode(object):
             logger.warning("Property '{}' already created.".format(id))
             return self.properties[id]
 
-    def addPropertyRange(self, id=None, lower=None, upper=None, name=None, unit=None, datatype=None, format=None):
+    def addPropertyRange(self, id=None, lower=None, upper=None, name=None, unit=None, datatype=None, format=None, retained=True):
         if not id:
             logger.error("'id' value required for HomieNodePropertyRange")
             return
@@ -38,7 +38,7 @@ class HomieNode(object):
             logger.error("'lower' and 'upper' values required for HomieNodePropertyRange")
             return
         if id not in self.properties:
-            homieNodePropertyRange = HomieNodePropertyRange(self, id, lower, upper, name, unit, datatype, format)
+            homieNodePropertyRange = HomieNodePropertyRange(self, id, lower, upper, name, unit, datatype, format, retained)
             homieNodePropertyRange.setSubscribe(self.homie.subscribeProperty)
             if homieNodePropertyRange:
                 self.properties[id] = homieNodePropertyRange
