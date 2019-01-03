@@ -228,10 +228,13 @@ class Device(object):
         # init and connect MQTT
         self._initialize()
 
+        self.intervalTimer = self.Timer(
+            self.statsInterval, self.publishStatsInterval, name="intervalTimer")
         self.uptimeTimer = self.Timer(
             self.statsInterval, self.publishUptime, name="uptimeTimer")
         self.signalTimer = self.Timer(
             self.statsInterval, self.publishSignal, name="signalTimer")
+        self.intervalTimer.start()
         self.uptimeTimer.start()
         self.signalTimer.start()
 
@@ -339,7 +342,7 @@ class Device(object):
     def publishStats(self):
         """Publish stats info"""
         payload = ",".join([
-            "interval", "uptime", "signal"
+            "signal"
         ])
         self.publish(
             self.mqtt_topic + "/$stats",
