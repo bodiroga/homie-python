@@ -32,8 +32,9 @@ def isValidFormat(datatype, format):
     # False if there is a format without datatype
     if not datatype and format:
         return False
-    if not format:
-        format = ""
+    # True if there is no format but the datatype is "string", "integer", "float" or "boolean"
+    if not format and datatype in ("string", "integer", "float", "boolean"):
+        return True
     if datatype == "color":
         allowed_formats = ("rgb", "hsv")
         return True if format in allowed_formats else False
