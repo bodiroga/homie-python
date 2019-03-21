@@ -56,7 +56,6 @@ class Device(object):
         super(Device, self).__init__()
         atexit.register(self._exitus)
 
-        self.deviceId = None
         self.deviceName = None
         self.host = None
         self.port = None
