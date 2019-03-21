@@ -144,7 +144,7 @@ class Device(object):
         self.mqtt.on_disconnect = self._disconnected
 
         self.mqtt.will_set(
-            self.mqtt_topic + "/$online", payload="lost", retain=True)
+            self.mqtt_topic + "/$state", payload="lost", retain=True)
 
         if self.username:
             self.mqtt.username_pw_set(self.username, password=self.password)
@@ -462,7 +462,7 @@ class Device(object):
         """ Clean up before exit """
 
         self.publish(
-            self.mqtt_topic + "/$online",
+            self.mqtt_topic + "/$state",
             payload="disconnected", retain=True)
 
         self.mqtt.loop_stop()
